@@ -265,6 +265,10 @@ void WebContentsPreferences::AppendCommandLineSwitches(
     }
   }
 
+  // Disable the remote module
+  if (IsEnabled(options::kDisableRemote))
+    command_line->AppendSwitch(switches::kDisableRemote);
+
   // Run Electron APIs and preload script in isolated world
   if (IsEnabled(options::kContextIsolation))
     command_line->AppendSwitch(switches::kContextIsolation);

@@ -237,6 +237,8 @@ class WebContents : public mate::TrackableObject<WebContents>,
   v8::Local<v8::Value> GetWebPreferences(v8::Isolate* isolate) const;
   v8::Local<v8::Value> GetLastWebPreferences(v8::Isolate* isolate) const;
 
+  bool IsRemoteDisabled() const;
+
   // Returns the owner window.
   v8::Local<v8::Value> GetOwnerBrowserWindow() const;
 
@@ -466,6 +468,9 @@ class WebContents : public mate::TrackableObject<WebContents>,
 
   // Whether to enable devtools.
   bool enable_devtools_ = true;
+
+  // Whether to disable remote.
+  bool disable_remote_ = false;
 
   // Observers of this WebContents.
   base::ObserverList<ExtendedWebContentsObserver> observers_;

@@ -78,6 +78,15 @@ std::vector<std::string> ParseSchemesCLISwitch(const char* switch_name) {
                            base::SPLIT_WANT_NONEMPTY);
 }
 
+void SetHiddenValue(v8::Handle<v8::Context> context,
+                    const base::StringPiece& key,
+                    v8::Local<v8::Value> value) {
+  v8::Isolate* isolate = context->GetIsolate();
+  v8::Local<v8::Private> privateKey =
+      v8::Private::ForApi(isolate, mate::StringToV8(isolate, key));
+  context->Global()->SetPrivate(context, privateKey, value);
+}
+
 }  // namespace
 
 RendererClientBase::RendererClientBase() {
@@ -99,10 +108,12 @@ void RendererClientBase::DidCreateScriptContext(
   std::string context_id = base::StringPrintf(
       "%" CrPRIdPid "-%d", base::GetCurrentProcId(), ++next_context_id_);
   v8::Isolate* isolate = context->GetIsolate();
-  v8::Local<v8::String> key = mate::StringToSymbol(isolate, "contextId");
-  v8::Local<v8::Private> private_key = v8::Private::ForApi(isolate, key);
-  v8::Local<v8::Value> value = mate::ConvertToV8(isolate, context_id);
-  context->Global()->SetPrivate(context, private_key, value);
+  SetHiddenValue(context, "contextId", mate::ConvertToV8(isolate, context_id));
+
+  auto* command_line = base::CommandLine::ForCurrentProcess();
+  if (command_line->HasSwitch(switches::kDisableRemote)) {
+    SetHiddenValue(context, "disableRemote", mate::ConvertToV8(isolate, true));
+  }
 }
 
 void RendererClientBase::AddRenderBindings(

@@ -355,6 +355,9 @@ WebContents::WebContents(v8::Isolate* isolate,
   // Whether to enable DevTools.
   options.Get("devTools", &enable_devtools_);
 
+  // Whether to disable remote.
+  options.Get("disableRemote", &disable_remote_);
+
   // Obtain the session.
   std::string partition;
   mate::Handle<api::Session> session;
@@ -1880,6 +1883,10 @@ v8::Local<v8::Value> WebContents::GetLastWebPreferences(
   return mate::ConvertToV8(isolate, *web_preferences->last_preference());
 }
 
+bool WebContents::IsRemoteDisabled() const {
+  return disable_remote_;
+}
+
 v8::Local<v8::Value> WebContents::GetOwnerBrowserWindow() const {
   if (owner_window())
     return BrowserWindow::From(isolate(), owner_window());
@@ -2030,6 +2037,7 @@ void WebContents::BuildPrototype(v8::Isolate* isolate,
       .SetMethod("_getPreloadPath", &WebContents::GetPreloadPath)
       .SetMethod("getWebPreferences", &WebContents::GetWebPreferences)
       .SetMethod("getLastWebPreferences", &WebContents::GetLastWebPreferences)
+      .SetMethod("_isRemoteDisabled", &WebContents::IsRemoteDisabled)
       .SetMethod("getOwnerBrowserWindow", &WebContents::GetOwnerBrowserWindow)
       .SetMethod("hasServiceWorker", &WebContents::HasServiceWorker)
       .SetMethod("unregisterServiceWorker",

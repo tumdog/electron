@@ -1313,6 +1313,37 @@ describe('BrowserWindow module', () => {
       })
     })
 
+    describe('"disableRemote" option', () => {
+      it('disables remote when set', async () => {
+        const preload = path.join(fixtures, 'module', 'preload-remote.js')
+        w.destroy()
+        w = new BrowserWindow({
+          show: false,
+          webPreferences: {
+            preload: preload,
+            disableRemote: true
+          }
+        })
+        w.loadURL(`file://${path.join(fixtures, 'api', 'blank.html')}`)
+        const [, remote] = await emittedOnce(ipcMain, 'remote')
+        expect(remote).to.equal('undefined')
+      })
+
+      it('enables remote when not set', async () => {
+        const preload = path.join(fixtures, 'module', 'preload-remote.js')
+        w.destroy()
+        w = new BrowserWindow({
+          show: false,
+          webPreferences: {
+            preload: preload
+          }
+        })
+        w.loadURL(`file://${path.join(fixtures, 'api', 'blank.html')}`)
+        const [, remote] = await emittedOnce(ipcMain, 'remote')
+        expect(remote).to.equal('object')
+      })
+    })
+
     describe('"sandbox" option', () => {
       function waitForEvents (emitter, events, callback) {
         let count = events.length
