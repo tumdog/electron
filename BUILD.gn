@@ -38,6 +38,7 @@ declare_args() {
   # need to test with chromium's location provider.
   # Should not be enabled for release build.
   enable_fake_location_provider = !is_official_build
+  enable_pdf_viewer = true
 }
 
 if (is_mas_build) {
@@ -71,6 +72,9 @@ config("features") {
   }
   if (enable_osr) {
     defines += [ "ENABLE_OSR=1" ]
+  }
+  if (enable_pdf_viewer) {
+    defines += [ "ENABLE_PDF_VIEWER=1" ]
   }
 }
 
@@ -355,7 +359,7 @@ static_library("electron_lib") {
     include_dirs += [ "//third_party/breakpad" ]
   }
 
-  if (enable_pdf) {
+  if (enable_pdf_viewer) {
     deps += [ "//pdf" ]
   }
 
